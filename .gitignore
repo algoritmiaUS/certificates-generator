@@ -1,3 +1,5 @@
 .github/
+.venv/
+.vscode/
 /data/
 /out/
