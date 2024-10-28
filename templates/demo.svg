@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="3508" height="2480">
+
+  <!-- Fondo -->
+  <rect x="0" y="0" width="3508" height="2480" fill="#f9f9f9" />
+
+  <!-- Marco decorativo -->
+  <rect x="100" y="100" width="3308" height="2280" fill="none" stroke="#000" stroke-width="12" />
+  <rect x="140" y="140" width="3228" height="2200" fill="none" stroke="#000" stroke-width="6" />
+
+  <!-- Cinta superior -->
+  <path d="M700,300 Q1754,100 2800,300 L2740,400 Q1754,200 760,400 Z" fill="#FFD700" stroke="#000" stroke-width="4"
+    transform="translate(0, 100)" />
+
+  <!-- Espacio para el logo de la asociacion -->
+  <rect x="300" y="300" width="300" height="300" fill="none" stroke="#000" stroke-width="8" />
+  <!-- <text x="450" y="630" font-size="35" text-anchor="middle" fill="#000">Logo Asociacion</text> -->
+
+  <!-- Espacio para el logo del patrocinador -->
+  <rect x="2908" y="300" width="300" height="300" fill="none" stroke="#000" stroke-width="8" />
+  <!-- <text x="3058" y="630" font-size="35" text-anchor="middle" fill="#000">Logo Patrocinador</text> -->
+
+  <!-- Texto completo -->
+  <text x="1754" y="1000" font-size="80" text-anchor="middle" fill="#000" font-family="Arial" width="3200">
+    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam sagittis magna
+  </text>
+  <text x="1754" y="1150" font-size="80" text-anchor="middle" fill="#000" font-family="Arial" width="3200">
+    convallis aliquet porta. Pellentesque faucibus est a lectus pulvinar,
+  </text>
+
+  <!-- Espacio para el nombre del destinatario -->
+  <text x="1754" y="1375" font-size="102" text-anchor="middle" fill="#000" font-family="Arial"
+    font-weight="bold">[Nombre del destinatario]</text>
+
+  <text x="1754" y="1600" font-size="80" text-anchor="middle" fill="#000" font-family="Arial" width="3200">
+    id lacinia ante sagittis. Phasellus augue lorem, cursus non augue id,
+  </text>
+  <text x="1754" y="1750" font-size="80" text-anchor="middle" fill="#000" font-family="Arial" width="3200">
+    rhoncus iaculis magna. Fusce convallis, nunc eu auctor ultricies, diam mi...
+  </text>
+  <text x="1754" y="1900" font-size="80" text-anchor="middle" fill="#000" font-family="Arial" width="3200">
+    [logro alcanzado]
+  </text>
+
+  <!-- Lineas decorativas arriba y abajo -->
+  <line x1="400" y1="2100" x2="3108" y2="2100" stroke="#000" stroke-width="5" />
+  <line x1="400" y1="800" x2="3108" y2="800" stroke="#000" stroke-width="5" />
+
+</svg>

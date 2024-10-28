@@ -6,7 +6,7 @@ import subprocess
 
 DATE = "2024-10-18"  # YYYY-MM-DD format
 
-TEMPLATE_PATH = "./templates/basic.svg"
+TEMPLATE_PATH = "./templates/demo.svg"
 FONT_PATH = "./fonts/Baskervville-Regular.ttf"
 FONT_NAME = "Baskervville"
 PARTICIPANTS_PATH = "./data/participants.csv"
