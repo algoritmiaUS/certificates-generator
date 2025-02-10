@@ -6,7 +6,8 @@ import subprocess
 import img2pdf
 from tqdm import tqdm
 
-DATE = "2024-10-18"  # YYYY-MM-DD format
+DATE = "2025-02-07"  # YYYY-MM-DD format
+COMPETITION_DATE = "7 de febrero de 2025"
 
 TEMPLATE_PATH = "./templates/{name}.svg"
 FONT_PATH = "./fonts/Baskervville-Regular.ttf"
@@ -44,6 +45,7 @@ def generate_certificate(
             template
             .replace("[Nombre del destinatario]", name)
             .replace("[logro alcanzado]", achievement)
+            .replace("[fecha competicion]", COMPETITION_DATE)
         )
 
     subprocess.call(
