@@ -6,8 +6,8 @@ import subprocess
 import img2pdf
 from tqdm import tqdm
 
-DATE = "2025-02-07"  # YYYY-MM-DD format
-COMPETITION_DATE = "7 de febrero de 2025"
+DATE = "2026-02-13"  # YYYY-MM-DD format
+COMPETITION_DATE = "13 de febrero de 2026"
 
 TEMPLATE_PATH = "./templates/{name}.svg"
 FONT_PATH = "./fonts/Baskervville-Regular.ttf"
@@ -124,9 +124,11 @@ if __name__ == "__main__":
         with open(WINNERS_PATH, encoding="utf-8") as winners_file:
             winners = winners_file.read().splitlines()[1:]
 
-        for name, achievement in zip(winners, WINNERS_ACHIEVEMENTS):
+        for line in winners:
+            name, position = line.split(";")
+            achievement = WINNERS_ACHIEVEMENTS[int(position) - 1]
             kebab_name = re.sub(r"\W+", "-", name.strip().casefold())
-            output_path = OUTPUT_PATH.format(name=kebab_name)
+            output_path = OUTPUT_PATH.format(name="w_" + kebab_name)
             generate_certificate(
                 name=name,
                 output_path=output_path,
