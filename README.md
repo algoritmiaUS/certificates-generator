@@ -23,6 +23,8 @@ Generador de certificados para los asistentes a las actividades del Club de Algo
  3. Por último, introduce el siguiente comando en la terminal: `python ./create_certificates.py`.
  4. Ya tienes los resultados en el directorio "./out"!
 
+Para ver otras opciones ejecuta `python ./create_certificates.py --help`.
+
 
 ## Licencia
 
