@@ -5,3 +5,8 @@
 /out/
 
 *.log
+
+auth.json
+token_*.pickle
+*.xlsx
+*.csv
