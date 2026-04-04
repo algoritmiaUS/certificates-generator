@@ -14,7 +14,8 @@ FONT_PATH = "./fonts/Baskervville-Regular.ttf"
 FONT_NAME = "Baskervville"
 PARTICIPANTS_PATH = "./data/participants.csv"
 WINNERS_PATH = "./data/winners.csv"
-OUTPUT_PATH = "./out/" + DATE + "_{name}.pdf"
+OUTPUT_DIR = "./out/"
+OUTPUT_PATH = OUTPUT_DIR + DATE + "_{name}.pdf"
 
 PARTICIPANT_ACHIEVEMENT = "haber participado"
 WINNERS_ACHIEVEMENTS = (
@@ -42,17 +43,20 @@ def generate_certificate(
 
     with open(tmp_svg_path, "w", encoding="utf-8") as tmp:
         tmp.write(
-            template
-            .replace("[Nombre del destinatario]", name)
+            template.replace("[Nombre del destinatario]", name)
             .replace("[logro alcanzado]", achievement)
             .replace("[fecha competicion]", COMPETITION_DATE)
         )
 
     subprocess.call(
         args=[
-            "resvg", tmp_svg_path, tmp_png_path,
-            "--use-font-file", FONT_PATH,
-            "--font-family", FONT_NAME,
+            "resvg",
+            tmp_svg_path,
+            tmp_png_path,
+            "--use-font-file",
+            FONT_PATH,
+            "--font-family",
+            FONT_NAME,
         ],
         stdout=stdout,
     )
@@ -69,10 +73,14 @@ def sign_certificate(file_path: str, signer_id: str, stdout=subprocess.DEVNULL):
 
     res = subprocess.call(
         args=[
-            "autofirmacommandline", "sign",
-            "-i", file_path,
-            "-o", file_path.replace(".pdf", "_signed.pdf"),
-            "-filter", f"subject.contains:{signer_id};nonexpired:",
+            "autofirmacommandline",
+            "sign",
+            "-i",
+            file_path,
+            "-o",
+            file_path.replace(".pdf", "_signed.pdf"),
+            "-filter",
+            f"subject.contains:{signer_id};nonexpired:",
         ],
         stdout=stdout,
     )
@@ -82,15 +90,16 @@ def sign_certificate(file_path: str, signer_id: str, stdout=subprocess.DEVNULL):
 
 
 if __name__ == "__main__":
-
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        "-t", "--template",
+        "-t",
+        "--template",
         help="Template name (i.e., 'demo' for ./templates/demo.svg)",
         default="demo",
     )
     parser.add_argument(
-        "-s", "--signerid",
+        "-s",
+        "--signerid",
         help="Signer ID (DNI/NIE) to sign the certificates",
     )
     args = parser.parse_args()
@@ -98,7 +107,6 @@ if __name__ == "__main__":
     signer_id = args.signerid
 
     with open(LOG_PATH, "w") as stdout:
-
         output_dir = os.path.dirname(OUTPUT_PATH)
         if not os.path.exists(output_dir):
             os.makedirs(output_dir)
@@ -139,6 +147,10 @@ if __name__ == "__main__":
 
         if signer_id is not None:
             for elem in tqdm(list(os.scandir("./out")), desc="Signing certificates"):
-                if elem.is_file() and elem.name.endswith(".pdf") and not elem.name.endswith("_signed.pdf"):
+                if (
+                    elem.is_file()
+                    and elem.name.endswith(".pdf")
+                    and not elem.name.endswith("_signed.pdf")
+                ):
                     sign_certificate(os.path.abspath(elem.path), signer_id)
                     os.remove(elem.path)
