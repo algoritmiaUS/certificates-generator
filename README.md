@@ -11,7 +11,7 @@ Generador de certificados para los asistentes a las actividades del Club de Algo
 > [!NOTE]
 > Si tu ordenador está poseído por Windows necesitarás descargar el archivo .exe correspondiente y asegurarte de guardarlo en un directorio que aparezca en la variable PATH.
 
- 3. Instala [Python 3](https://www.python.org/downloads/) (si es que no lo tienes ya). Este código ha sido probado para Python 3.12.1 y no requiere más dependencias externas.
+ 3. Instala [Python 3](https://www.python.org/downloads/) (si es que no lo tienes ya). Este código ha sido probado para Python 3.12.1.
 
  4. Instala las dependencias de Python: `pip install -r requirements.txt`.
 
