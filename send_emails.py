@@ -22,7 +22,7 @@ EMAIL = ""
 SUBJECT = ""
 MESSAGE = ""
 MAILING_LIST_FILE = "archivo.xlsx"
-COLUMNS = [1, 2]
+COLUMNS = [0, 1]
 
 
 def process_mailing_list(file_name: str) -> pl.DataFrame:
