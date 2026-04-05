@@ -1,6 +1,9 @@
+
+
 # CAUS - Certificates generator
 
 Generador de certificados para los asistentes a las actividades del Club de Algoritmia de la Universidad de Sevilla.
+
 
 ## Instalación
 
@@ -15,32 +18,15 @@ Generador de certificados para los asistentes a las actividades del Club de Algo
 
  4. Instala las dependencias de Python: `pip install -r requirements.txt`.
 
+
 ## Configuración
 
-1. Crea un archivo llamado `.env` en la raíz del proyecto para definir la configuración. Puedes usar este formato de ejemplo:
-
-```env
-# Configuración General
-CSV_FILE_PATH=./data/participants.csv
-DATE=2026-02-13
-COMPETITION_DATE=13 de febrero de 2026
-
-# Configuración de Certificados
-TEMPLATE_PATH=./templates/{name}.svg
-FONT_PATH=./fonts/Baskervville-Regular.ttf
-FONT_NAME=Baskervville
-OUTPUT_DIR=./out/
-
-# Configuración de Emails
-EMAIL=tu_correo@gmail.com
-SUBJECT=Certificado de Participación
-MESSAGE=Adjunto encontrarás tu certificado.
-```
-
+1. Crea un archivo llamado `.env` en la raíz del proyecto para definir la configuración. Puedes utilizar el archivo [.env.sample](./.env.sample) como referencia.
 2. Preparación del archivo CSV. Ambos scripts de este proyecto (el generador y el que envía los correos) leen de un **único archivo CSV** (por defecto `participants.csv`), que debe incluir una línea de cabeceras con los siguientes campos:
     - `position`: Indica si la persona ha ganado. Usa `1`, `2` o `3` para las medallas de oro, plata o bronce. Deja este campo vacío o usa `0` para participantes regulares.
     - `name`: Nombre del destinatario que aparecerá en el certificado.
     - `email`: Correo al que se le enviará el resultado.
+
 
 ## Generación de certificados
 
@@ -50,7 +36,9 @@ MESSAGE=Adjunto encontrarás tu certificado.
 
 Para ver otras opciones ejecuta `python ./create_certificates.py --help`.
 
+
 ## Envío de emails
+
 
 ### Configuración de la API de Gmail
 
@@ -60,15 +48,18 @@ Para ver otras opciones ejecuta `python ./create_certificates.py --help`.
  4. Descarga el archivo JSON resultante y guárdalo en la raíz del repositorio como `auth.json`.
  5. La primera vez que ejecutes el script se abrirá el navegador para que autorices el acceso a la cuenta de Gmail. Se generará automáticamente un archivo `token_gmail_v1.pickle` con las credenciales ya autorizadas.
 
+
 ### Preparación del archivo de mailing
 
 El archivo de mailing CSV debe contener los datos de los participantes para el envío. Este es el mismo archivo que se usa para generar los certificados y que debes tener definido en tu archivo `.env` (`CSV_FILE_PATH`). El script leerá el archivo completo, buscará la correspondencia basándose en la posición (`position`), el nombre convertido a formato *kebab-case* y añadirá el prefijo `_signed` que añade la aplicación externa de firma (ej: `{position}_{DATE}_nombre-apellido_signed.pdf`).
+
 
 ### Configuración y ejecución
 
  1. Asegúrate de tener el archivo `.env` completo y tu archivo CSV listo.
  2. Opcional: Modifica cualquier texto de los correos (`SUBJECT`, `MESSAGE`) si necesitas cambiarlos para diferentes envíos.
  3. Ejecuta `python ./send_emails.py`.
+
 
 ## Licencia
 
