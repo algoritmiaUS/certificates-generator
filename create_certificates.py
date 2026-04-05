@@ -3,7 +3,6 @@ import csv
 import os
 import re
 import subprocess
-import sys
 from dotenv import load_dotenv
 
 import img2pdf
@@ -11,8 +10,8 @@ from tqdm import tqdm
 
 load_dotenv()
 
-DATE = os.getenv("DATE")
-COMPETITION_DATE = os.getenv("COMPETITION_DATE")
+DATE = os.environ["DATE"]
+COMPETITION_DATE = os.environ["COMPETITION_DATE"]
 TEMPLATE_PATH = os.getenv("TEMPLATE_PATH", "./templates/{name}.svg")
 FONT_PATH = os.getenv("FONT_PATH", "./fonts/Baskervville-Regular.ttf")
 FONT_NAME = os.getenv("FONT_NAME", "Baskervville")
@@ -93,11 +92,6 @@ def sign_certificate(file_path: str, signer_id: str, stdout=subprocess.DEVNULL):
 
 
 if __name__ == "__main__":
-    if not DATE or not COMPETITION_DATE:
-        sys.exit(
-            "Error: Las variables DATE y COMPETITION_DATE deben estar configuradas en el archivo .env"
-        )
-
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "-t",

@@ -23,7 +23,7 @@ EMAIL = os.getenv("EMAIL", "")
 SUBJECT = os.getenv("SUBJECT", "")
 MESSAGE = os.getenv("MESSAGE", "")
 CSV_FILE_PATH = os.getenv("CSV_FILE_PATH", "./data/participants.csv")
-DATE = os.getenv("DATE", "2026-02-13")
+DATE = os.environ["DATE"]
 OUTPUT_DIR = os.getenv("OUTPUT_DIR", "./out/")
 
 
