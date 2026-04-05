@@ -1,20 +1,23 @@
 import argparse
+import csv
 import os
 import re
 import subprocess
+from dotenv import load_dotenv
 
 import img2pdf
 from tqdm import tqdm
 
-DATE = "2026-02-13"  # YYYY-MM-DD format
-COMPETITION_DATE = "13 de febrero de 2026"
+load_dotenv()
 
-TEMPLATE_PATH = "./templates/{name}.svg"
-FONT_PATH = "./fonts/Baskervville-Regular.ttf"
-FONT_NAME = "Baskervville"
-PARTICIPANTS_PATH = "./data/participants.csv"
-WINNERS_PATH = "./data/winners.csv"
-OUTPUT_PATH = "./out/" + DATE + "_{name}.pdf"
+DATE = os.environ["DATE"]
+COMPETITION_DATE = os.environ["COMPETITION_DATE"]
+TEMPLATE_PATH = os.getenv("TEMPLATE_PATH", "./templates/{name}.svg")
+FONT_PATH = os.getenv("FONT_PATH", "./fonts/Baskervville-Regular.ttf")
+FONT_NAME = os.getenv("FONT_NAME", "Baskervville")
+CSV_FILE_PATH = os.getenv("CSV_FILE_PATH", "./data/participants.csv")
+OUTPUT_DIR = os.getenv("OUTPUT_DIR", "./out/")
+OUTPUT_PATH = os.path.join(OUTPUT_DIR, "{prefix}_" + DATE + "_{name}.pdf")
 
 PARTICIPANT_ACHIEVEMENT = "haber participado"
 WINNERS_ACHIEVEMENTS = (
@@ -42,17 +45,20 @@ def generate_certificate(
 
     with open(tmp_svg_path, "w", encoding="utf-8") as tmp:
         tmp.write(
-            template
-            .replace("[Nombre del destinatario]", name)
+            template.replace("[Nombre del destinatario]", name)
             .replace("[logro alcanzado]", achievement)
             .replace("[fecha competicion]", COMPETITION_DATE)
         )
 
     subprocess.call(
         args=[
-            "resvg", tmp_svg_path, tmp_png_path,
-            "--use-font-file", FONT_PATH,
-            "--font-family", FONT_NAME,
+            "resvg",
+            tmp_svg_path,
+            tmp_png_path,
+            "--use-font-file",
+            FONT_PATH,
+            "--font-family",
+            FONT_NAME,
         ],
         stdout=stdout,
     )
@@ -69,10 +75,14 @@ def sign_certificate(file_path: str, signer_id: str, stdout=subprocess.DEVNULL):
 
     res = subprocess.call(
         args=[
-            "autofirmacommandline", "sign",
-            "-i", file_path,
-            "-o", file_path.replace(".pdf", "_signed.pdf"),
-            "-filter", f"subject.contains:{signer_id};nonexpired:",
+            "autofirmacommandline",
+            "sign",
+            "-i",
+            file_path,
+            "-o",
+            file_path.replace(".pdf", "_signed.pdf"),
+            "-filter",
+            f"subject.contains:{signer_id};nonexpired:",
         ],
         stdout=stdout,
     )
@@ -82,15 +92,16 @@ def sign_certificate(file_path: str, signer_id: str, stdout=subprocess.DEVNULL):
 
 
 if __name__ == "__main__":
-
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        "-t", "--template",
+        "-t",
+        "--template",
         help="Template name (i.e., 'demo' for ./templates/demo.svg)",
         default="demo",
     )
     parser.add_argument(
-        "-s", "--signerid",
+        "-s",
+        "--signerid",
         help="Signer ID (DNI/NIE) to sign the certificates",
     )
     args = parser.parse_args()
@@ -98,7 +109,6 @@ if __name__ == "__main__":
     signer_id = args.signerid
 
     with open(LOG_PATH, "w") as stdout:
-
         output_dir = os.path.dirname(OUTPUT_PATH)
         if not os.path.exists(output_dir):
             os.makedirs(output_dir)
@@ -107,28 +117,34 @@ if __name__ == "__main__":
         with open(template_path, encoding="utf-8") as template_file:
             template = template_file.read()
 
-        with open(PARTICIPANTS_PATH, encoding="utf-8") as participants_file:
-            participants = participants_file.read().splitlines()[1:]
+        with open(CSV_FILE_PATH, encoding="utf-8") as csv_file:
+            reader = csv.DictReader(csv_file)
+            rows = list(reader)
 
-        for name in tqdm(participants, desc="Generating certificates for participants"):
-            kebab_name = re.sub(r"\W+", "-", name.strip().casefold())
-            output_path = OUTPUT_PATH.format(name=kebab_name)
-            generate_certificate(
-                name=name,
-                output_path=output_path,
-                template=template,
-                achievement=PARTICIPANT_ACHIEVEMENT,
-                stdout=stdout,
-            )
+        for row in tqdm(rows, desc="Generating certificates"):
+            name = row.get("name", "").strip()
+            if not name:
+                print(f"Falta nombre de: {row.get('email', '')}")
+                continue
 
-        with open(WINNERS_PATH, encoding="utf-8") as winners_file:
-            winners = winners_file.read().splitlines()[1:]
+            position = str(row.get("position", "")).strip()
 
-        for line in winners:
-            name, position = line.split(";")
-            achievement = WINNERS_ACHIEVEMENTS[int(position) - 1]
-            kebab_name = re.sub(r"\W+", "-", name.strip().casefold())
-            output_path = OUTPUT_PATH.format(name="w_" + kebab_name)
+            if position == "1":
+                prefix = "1"
+                achievement = WINNERS_ACHIEVEMENTS[0]
+            elif position == "2":
+                prefix = "2"
+                achievement = WINNERS_ACHIEVEMENTS[1]
+            elif position == "3":
+                prefix = "3"
+                achievement = WINNERS_ACHIEVEMENTS[2]
+            else:
+                prefix = "0"
+                achievement = PARTICIPANT_ACHIEVEMENT
+
+            kebab_name = re.sub(r"\W+", "-", name.casefold()).strip("-")
+            output_path = OUTPUT_PATH.format(prefix=prefix, name=kebab_name)
+
             generate_certificate(
                 name=name,
                 output_path=output_path,
@@ -138,7 +154,11 @@ if __name__ == "__main__":
             )
 
         if signer_id is not None:
-            for elem in tqdm(list(os.scandir("./out")), desc="Signing certificates"):
-                if elem.is_file() and elem.name.endswith(".pdf") and not elem.name.endswith("_signed.pdf"):
+            for elem in tqdm(list(os.scandir(OUTPUT_DIR)), desc="Signing certificates"):
+                if (
+                    elem.is_file()
+                    and elem.name.endswith(".pdf")
+                    and not elem.name.endswith("_signed.pdf")
+                ):
                     sign_certificate(os.path.abspath(elem.path), signer_id)
                     os.remove(elem.path)
