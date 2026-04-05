@@ -88,12 +88,20 @@ def send_email(service, to: str, file_path: str):
         mime_message.attach(part)
 
     raw_string = base64.urlsafe_b64encode(mime_message.as_bytes()).decode()
-    m = service.users().messages().send(userId="me", body={"raw": raw_string}).execute()
+    try:
+        m = service.users().messages().send(userId="me", body={"raw": raw_string}).execute()
+        print(m)
+    except Exception as e:
+        print(f"Failed to send email to {to}: {e}")
     print(m)
 
 
 if __name__ == "__main__":
     service = Create_Service(CLIENT_SECRET_FILE, API_NAME, API_VERSION, SCOPES)
+    if service is None:
+        raise RuntimeError(
+            "Failed to create Gmail service. Check authentication, API configuration, and network connectivity."
+        )
     df_mailings = process_mailing_list(MAILING_LIST_FILE)
     for row in df_mailings.iter_rows(named=True):
         send_email(service, row["email"], row["file_path"])
