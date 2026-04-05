@@ -49,11 +49,6 @@ Para ver otras opciones ejecuta `python ./create_certificates.py --help`.
  5. La primera vez que ejecutes el script se abrirá el navegador para que autorices el acceso a la cuenta de Gmail. Se generará automáticamente un archivo `token_gmail_v1.pickle` con las credenciales ya autorizadas.
 
 
-### Preparación del archivo de mailing
-
-El archivo de mailing CSV debe contener los datos de los participantes para el envío. Este es el mismo archivo que se usa para generar los certificados y que debes tener definido en tu archivo `.env` (`CSV_FILE_PATH`). El script leerá el archivo completo, buscará la correspondencia basándose en la posición (`position`), el nombre convertido a formato *kebab-case* y añadirá el prefijo `_signed` que añade la aplicación externa de firma (ej: `{position}_{DATE}_nombre-apellido_signed.pdf`).
-
-
 ### Configuración y ejecución
 
  1. Asegúrate de tener el archivo `.env` completo y tu archivo CSV listo.
