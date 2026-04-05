@@ -1,10 +1,12 @@
 .venv/
 .vscode/
+__pycache__/
 
 /data/
 /out/
 
 *.log
+.env
 
 auth.json
 token_*.pickle

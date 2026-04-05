@@ -1,72 +1,57 @@
 import base64
+import csv
 import os
+import re
 from email import encoders
 from email.mime.base import MIMEBase
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
-from pathlib import Path
-
-import polars as pl
+from dotenv import load_dotenv
 
 from Google import Create_Service
-from create_certificates import DATE, OUTPUT_DIR
+
+load_dotenv()
 
 # Google
 CLIENT_SECRET_FILE = "auth.json"
 API_NAME = "gmail"
 API_VERSION = "v1"
-SCOPES = ["https://mail.google.com/"]
+SCOPES = ["https://www.googleapis.com/auth/gmail.send"]
 
 # Personalize
-EMAIL = ""
-SUBJECT = ""
-MESSAGE = ""
-MAILING_LIST_FILE = "archivo.xlsx"
-COLUMNS = [0, 1]
+EMAIL = os.getenv("EMAIL", "")
+SUBJECT = os.getenv("SUBJECT", "")
+MESSAGE = os.getenv("MESSAGE", "")
+CSV_FILE_PATH = os.getenv("CSV_FILE_PATH", "./data/participants.csv")
+DATE = os.getenv("DATE", "2026-02-13")
+OUTPUT_DIR = os.getenv("OUTPUT_DIR", "./out/")
 
 
-def process_mailing_list(file_name: str) -> pl.DataFrame:
-    """Process the mailing list file and return a DataFrame with key and email columns."""
-    path = Path(file_name)
-    if path.suffix == ".csv":
-        df = pl.read_csv(path, columns=COLUMNS)
-    else:
-        df = pl.read_excel(path, columns=COLUMNS)
+def process_mailing_list(file_name: str):
+    """Process the mailing list file and yield dicts with email and file_path."""
+    if not os.path.exists(file_name):
+        return
 
-    cols = df.columns
-    df_names = pl.concat(
-        [
-            df.select([pl.col(cols[0]).alias("key"), pl.col(cols[1]).alias("email")]),
-        ]
-    )
+    with open(file_name, encoding="utf-8") as f:
+        reader = csv.DictReader(f)
+        for row in reader:
+            name = row.get("name", "").strip()
+            email = row.get("email", "").strip()
+            if not name or not email:
+                continue
 
-    df_processed = (
-        df_names.drop_nulls(subset=["key"])
-        .with_columns(
-            pl.col("key")
-            .cast(pl.Utf8)
-            .str.strip_chars()
-            .str.to_lowercase()
-            .str.replace_all(r"\W+", "-")
-            .str.strip_chars("-")
-            .alias("key_clean")
-        )
-        .with_columns(
-            file_path=pl.lit(OUTPUT_DIR + DATE)
-            + "_"
-            + pl.col("key_clean")
-            + "_signed.pdf"
-        )
-        .with_columns(
-            exists=pl.col("file_path").map_elements(
-                lambda p: Path(p).exists(), return_dtype=pl.Boolean
-            )
-        )
-        .filter(pl.col("exists"))
-        .unique(subset=["key_clean"])
-    )
+            position = str(row.get("position", "")).strip()
+            if position in ("1", "2", "3"):
+                prefix = position
+            else:
+                prefix = "0"
 
-    return df_processed
+            kebab_name = re.sub(r"\W+", "-", name.casefold()).strip("-")
+            filename = f"{prefix}_{DATE}_{kebab_name}_signed.pdf"
+            file_path = os.path.join(OUTPUT_DIR, filename)
+
+            if os.path.exists(file_path):
+                yield {"email": email, "file_path": file_path}
 
 
 def send_email(service, to: str, file_path: str):
@@ -89,11 +74,15 @@ def send_email(service, to: str, file_path: str):
 
     raw_string = base64.urlsafe_b64encode(mime_message.as_bytes()).decode()
     try:
-        m = service.users().messages().send(userId="me", body={"raw": raw_string}).execute()
+        m = (
+            service.users()
+            .messages()
+            .send(userId="me", body={"raw": raw_string})
+            .execute()
+        )
         print(m)
     except Exception as e:
         print(f"Failed to send email to {to}: {e}")
-    print(m)
 
 
 if __name__ == "__main__":
@@ -102,6 +91,6 @@ if __name__ == "__main__":
         raise RuntimeError(
             "Failed to create Gmail service. Check authentication, API configuration, and network connectivity."
         )
-    df_mailings = process_mailing_list(MAILING_LIST_FILE)
-    for row in df_mailings.iter_rows(named=True):
+
+    for row in process_mailing_list(CSV_FILE_PATH):
         send_email(service, row["email"], row["file_path"])

@@ -15,12 +15,38 @@ Generador de certificados para los asistentes a las actividades del Club de Algo
 
  4. Instala las dependencias de Python: `pip install -r requirements.txt`.
 
+## Configuración
+
+1. Crea un archivo llamado `.env` en la raíz del proyecto para definir la configuración. Puedes usar este formato de ejemplo:
+
+```env
+# Configuración General
+CSV_FILE_PATH=./data/participants.csv
+DATE=2026-02-13
+COMPETITION_DATE=13 de febrero de 2026
+
+# Configuración de Certificados
+TEMPLATE_PATH=./templates/{name}.svg
+FONT_PATH=./fonts/Baskervville-Regular.ttf
+FONT_NAME=Baskervville
+OUTPUT_DIR=./out/
+
+# Configuración de Emails
+EMAIL=tu_correo@gmail.com
+SUBJECT=Certificado de Participación
+MESSAGE=Adjunto encontrarás tu certificado.
+```
+
+2. Preparación del archivo CSV. Ambos scripts de este proyecto (el generador y el que envía los correos) leen de un **único archivo CSV** (por defecto `participants.csv`), que debe incluir una línea de cabeceras con los siguientes campos:
+    - `position`: Indica si la persona ha ganado. Usa `1`, `2` o `3` para las medallas de oro, plata o bronce. Deja este campo vacío o usa `0` para participantes regulares.
+    - `name`: Nombre del destinatario que aparecerá en el certificado.
+    - `email`: Correo al que se le enviará el resultado.
+
 ## Generación de certificados
 
- 1. Indica los nombres de los participantes en el archivo CSV "./data/participants.csv", creándolo si no existe. El archivo debe incluir una línea de cabeceras.
- 2. Indica los nombres de los ganadores en el archivo CSV "./data/winners.csv", creándolo si no existe. El archivo debe incluir una línea de cabeceras.
- 3. Por último, introduce el siguiente comando en la terminal: `python ./create_certificates.py`.
- 4. Ya tienes los resultados en el directorio "./out"!
+ 1. Rellena el archivo configurado en tu `.env` con los datos de los participantes (como se indica arriba).
+ 2. Introduce el siguiente comando en la terminal: `python ./create_certificates.py`.
+ 3. Ya tienes los resultados en el directorio indicado (por defecto `./out/`)!
 
 Para ver otras opciones ejecuta `python ./create_certificates.py --help`.
 
@@ -36,18 +62,13 @@ Para ver otras opciones ejecuta `python ./create_certificates.py --help`.
 
 ### Preparación del archivo de mailing
 
-El archivo de mailing (CSV o Excel) debe contener los datos de los participantes para el envío. Es **muy importante** que los nombres en este archivo sean exactamente los mismos que se usaron en los archivos CSV al generar los certificados (`participants.csv` o `winners.csv`), ya que se usan para buscar el PDF correspondiente de cada persona.
-
-Ten en cuenta que, dependiendo de la estructura de tu archivo de mailing, puede que necesites editar la función `process_mailing_list` dentro de `send_emails.py` para indicar qué columnas deben ser leídas (por defecto el script toma la primera columna como el nombre y la segunda como el email).
+El archivo de mailing CSV debe contener los datos de los participantes para el envío. Este es el mismo archivo que se usa para generar los certificados y que debes tener definido en tu archivo `.env` (`CSV_FILE_PATH`). El script leerá el archivo completo, buscará la correspondencia basándose en la posición (`position`), el nombre convertido a formato *kebab-case* y añadirá el prefijo `_signed` que añade la aplicación externa de firma (ej: `{position}_{DATE}_nombre-apellido_signed.pdf`).
 
 ### Configuración y ejecución
 
- 1. Abre `send_emails.py` y edita las constantes de la sección `# Personalize`:
-    - `EMAIL`: dirección de correo desde la que se envían los emails.
-    - `SUBJECT`: asunto del email.
-    - `MESSAGE`: cuerpo del email.
-    - `MAILING_LIST_FILE`: ruta al archivo CSV o Excel con los datos.
- 2. Ejecuta `python ./send_emails.py`.
+ 1. Asegúrate de tener el archivo `.env` completo y tu archivo CSV listo.
+ 2. Opcional: Modifica cualquier texto de los correos (`SUBJECT`, `MESSAGE`) si necesitas cambiarlos para diferentes envíos.
+ 3. Ejecuta `python ./send_emails.py`.
 
 ## Licencia
 
