@@ -60,7 +60,8 @@ def send_email(service, to: str, file_path: str):
 
     mime_message = MIMEMultipart()
     mime_message["to"] = to
-    mime_message["from"] = EMAIL
+    if EMAIL.strip():
+        mime_message["from"] = EMAIL.strip()
     mime_message["subject"] = SUBJECT
     mime_message.attach(MIMEText(MESSAGE, "plain"))
 
