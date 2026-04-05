@@ -8,7 +8,7 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from dotenv import load_dotenv
 
-from Google import Create_Service
+from Google import create_service
 
 load_dotenv()
 
@@ -86,7 +86,7 @@ def send_email(service, to: str, file_path: str):
 
 
 if __name__ == "__main__":
-    service = Create_Service(CLIENT_SECRET_FILE, API_NAME, API_VERSION, SCOPES)
+    service = create_service(CLIENT_SECRET_FILE, API_NAME, API_VERSION, SCOPES)
     if service is None:
         raise RuntimeError(
             "Failed to create Gmail service. Check authentication, API configuration, and network connectivity."
