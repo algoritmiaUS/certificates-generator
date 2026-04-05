@@ -94,11 +94,9 @@ def sign_certificate(file_path: str, signer_id: str, stdout=subprocess.DEVNULL):
 
 if __name__ == "__main__":
     if not DATE or not COMPETITION_DATE:
-        print(
-            "Error: Las variables DATE y COMPETITION_DATE deben estar configuradas en el archivo .env",
-            file=sys.stderr,
+        sys.exit(
+            "Error: Las variables DATE y COMPETITION_DATE deben estar configuradas en el archivo .env"
         )
-        sys.exit(1)
 
     parser = argparse.ArgumentParser()
     parser.add_argument(
